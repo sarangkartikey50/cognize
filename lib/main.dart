@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cognize/utility/app_theme.dart';
+import 'package:cognize/utility/constants.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -57,6 +58,40 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
                 )
               )
             )
+          ),
+          Positioned.fromRect(
+            rect: Rect.fromLTWH(0.0, MediaQuery.of(context).size.height - 60.0, MediaQuery.of(context).size.width, 60.0),
+            child: GestureDetector(
+              onTap: showPersistentBottomSheet,
+              child: Container(
+                height: 60.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15.0), topEnd:  Radius.circular(15.0)),
+                  color: Colors.white
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(top: 5.0),
+                      height: 25.0,
+                      child: Icon(Icons.maximize, size: 30.0, color: Color(0xffe1e1e1))
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.only(left: 20.0),
+                      child: Text("Tip: tap text to get the translation", style: TextStyle(
+                        color: Color(0xff333333),
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500
+                      ), textAlign: TextAlign.left,)
+                    )
+                  ],
+                )
+              )
+            )
           )
         ],
       ),
@@ -92,7 +127,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
 
   void cameraClicked(){
-    showInSnackBar('camera clicked.');
     onTakePictureButtonPressed();
   }
 
@@ -100,6 +134,26 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
   void showInSnackBar(String message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void showPersistentBottomSheet(){
+    _scaffoldKey.currentState.showBottomSheet((context){
+      return new Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15.0), topEnd:  Radius.circular(15.0)),
+          color: Colors.white
+        ),
+        height: 250.0,
+        child: new Center(
+          child: Text("Tip: tap text to get the translation", style: TextStyle(
+              color: Color(0xff333333),
+              fontSize: 16.0,
+              fontWeight: FontWeight.w500
+            ),
+          )
+        ),
+      );
+    });
   }
 
   void onNewCameraSelected(CameraDescription cameraDescription) async {
@@ -112,7 +166,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
     controller.addListener(() {
       if (mounted) setState(() {});
       if (controller.value.hasError) {
-        showInSnackBar('Camera error ${controller.value.errorDescription}');
+        showInSnackBar('${controller.value.errorDescription}');
       }
     });
 
@@ -126,6 +180,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
       setState(() {});
     }
   }
+
+  
 
   void onTakePictureButtonPressed() {
     takePicture().then((String filePath) {
@@ -146,7 +202,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
     final Directory extDir = await getApplicationDocumentsDirectory();
     final String dirPath = '${extDir.path}/Pictures/cognize';
     await Directory(dirPath).create(recursive: true);
-    final String filePath = 'cognize.jpg';
+    final String filePath = '$dirPath/${timestamp()}.jpg';
 
     if (controller.value.isTakingPicture) {
       // A capture is already pending, do nothing.
