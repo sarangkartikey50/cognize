@@ -139,18 +139,95 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   void showPersistentBottomSheet(){
     _scaffoldKey.currentState.showBottomSheet((context){
       return new Container(
+        padding: EdgeInsets.only(left: 20.0, right: 20.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15.0), topEnd:  Radius.circular(15.0)),
           color: Colors.white
         ),
         height: 250.0,
-        child: new Center(
-          child: Text("Tip: tap text to get the translation", style: TextStyle(
-              color: Color(0xff333333),
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 5.0),
+              height: 25.0,
+              child: Icon(Icons.maximize, size: 30.0, color: Color(0xffe1e1e1))
             ),
-          )
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: Text("Tip: tap text to get the translation", style: TextStyle(
+                color: Color(0xff333333),
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500
+              ), textAlign: TextAlign.left,)
+            ),
+            SizedBox(height: 10.0),
+            Divider(color: Color(0xffe1e1e1), height: 2.0,),
+            SizedBox(height: 20.0,),
+            Row(
+              children: <Widget>[
+                Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    color: Constants.primaryColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(25.0)
+                  ),
+                  child: Icon(Icons.hearing, size: 25.0, color: Constants.primaryColor),
+                ),
+                SizedBox(width: 10.0,),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text("Audio Translation", style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff333333),
+                      fontSize: 16.0,
+                    ), textAlign: TextAlign.left,),
+                    Text("Tap on text get audio translation in multiple languages.", style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff666666),
+                      fontSize: 12.0,
+                    )),
+                  ],
+                )
+              ],
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              children: <Widget>[
+                Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    color: Color(0xff64a35a).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(25.0)
+                  ),
+                  child: Icon(Icons.translate, size: 25.0, color: Color(0xff64a35a)),
+                ),
+                SizedBox(width: 10.0,),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text("Text Translation", style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff333333),
+                      fontSize: 16.0,
+                    ), textAlign: TextAlign.left,),
+                    Text("Tap on text get text translation in multiple languages.", style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff666666),
+                      fontSize: 12.0,
+                    )),
+                  ],
+                )
+              ],
+            )
+          ],
         ),
       );
     });
@@ -180,8 +257,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
       setState(() {});
     }
   }
-
-  
 
   void onTakePictureButtonPressed() {
     takePicture().then((String filePath) {
