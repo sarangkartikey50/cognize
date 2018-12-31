@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 import 'package:cognize/utility/app_theme.dart';
 import 'package:cognize/utility/constants.dart';
+import 'package:cognize/screens/display.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -22,7 +22,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   CameraController controller;
   String imagePath;
   String videoPath;
-  VideoPlayerController videoController;
   VoidCallback videoPlayerListener;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -128,6 +127,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
   void cameraClicked(){
     onTakePictureButtonPressed();
+    Navigator.of(context).pushNamed('/display');
   }
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
@@ -305,6 +305,9 @@ class CameraApp extends StatelessWidget {
     return MaterialApp(
       theme: AppTheme.getTheme,
       home: CameraExampleHome(),
+      routes: <String, WidgetBuilder>{
+        '/display': (BuildContext context) => new Display(),
+      }
     );
   }
 }

@@ -27,7 +27,7 @@ dependencies:
   connectivity: ^0.3.2
   flutter_svg: any
   camera: ^0.2.6
-  video_player: ^0.8.0
+  audioplayers: ^0.7.8
 
 dev_dependencies:
   flutter_test:
@@ -46,9 +46,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
+  assets:
+   - lib/images/example.jpg
+   - lib/resources/english.mp3
+   - lib/resources/french.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
