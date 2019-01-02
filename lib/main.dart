@@ -7,6 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:cognize/utility/app_theme.dart';
 import 'package:cognize/utility/constants.dart';
 import 'package:cognize/screens/display.dart';
+import 'package:aws_ai/src/RekognitionHandler.dart';
+import 'dart:convert';
+import 'package:cognize/screens/display.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -127,7 +130,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
   void cameraClicked(){
     onTakePictureButtonPressed();
-    Navigator.of(context).pushNamed('/display');
   }
 
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
@@ -286,11 +288,45 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
     try {
       await controller.takePicture(filePath);
+      recognizeText(filePath);
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
     }
     return filePath;
+  }
+
+  void recognizeText(path){
+    File sourceImagefile = File(path);
+
+    RekognitionHandler rekognition = new RekognitionHandler(Constants.AWS_ACCESSKEY, Constants.AWS_SECRETKEY, Constants.AWS_REGION);
+    Future<String> labelsArray = rekognition.detectText(sourceImagefile);
+
+    String fullText = "";
+
+    labelsArray.then((res) {
+      var responseArray = jsonDecode(res);
+      var textDetections = responseArray["TextDetections"];
+      print(textDetections.toString());
+      for(var i=0; i<textDetections.length; i++){
+        if(textDetections[i]["Type"] == "LINE"){
+          fullText = fullText + " " + textDetections[i]["DetectedText"];
+        }
+        if(textDetections[i]["Type"] == "WORD")
+          break;
+      }
+
+      if(fullText.length > 0){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Display({"fullText": fullText}),
+          ),
+        );
+      } else {
+        print("there was some error.");
+      }
+    });
   }
 
   void _showCameraException(CameraException e) {
@@ -306,7 +342,7 @@ class CameraApp extends StatelessWidget {
       theme: AppTheme.getTheme,
       home: CameraExampleHome(),
       routes: <String, WidgetBuilder>{
-        '/display': (BuildContext context) => new Display(),
+        '/display': (BuildContext context) => new Display({"fullText": ""}),
       }
     );
   }

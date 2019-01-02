@@ -28,6 +28,7 @@ dependencies:
   flutter_svg: any
   camera: ^0.2.6
   audioplayers: ^0.7.8
+  aws_ai: ^0.0.3
 
 dev_dependencies:
   flutter_test:

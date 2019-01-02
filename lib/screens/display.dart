@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:cognize/utility/constants.dart';
 import 'package:audioplayers/audio_cache.dart';
+import 'package:cognize/utility/customHttp.dart';
+import 'dart:convert';
+import 'package:aws_ai/src/TranslateHandler.dart';
 
 class Display extends StatefulWidget{
+  var bundle;
+  Display(this.bundle);
   @override
   _State createState(){
-    return _State();
+    return _State(this.bundle);
   }
 }
 
 class _State extends State<Display>{
+
+  var bundle;
+  var fullText = "";
+  var translatedText = "";
+
+  _State(this.bundle);
+
+  @override
+  void initState(){
+    fullText = this.bundle["fullText"];
+    getHttpResponse();
+  }
+
+  void getHttpResponse() async {
+    if(fullText.length > 0){
+      var response = await CustomHttp.customPost(Constants.TRANSLATE_URL, jsonEncode({
+        "fullText": fullText,
+        "targetLanguage": "fr",
+        "session": "abc"
+      }));
+      print(response.body);
+    }
+  }
+
   Widget build(BuildContext context){
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -55,7 +85,7 @@ class _State extends State<Display>{
                   )
                 ),
                 child: Text(
-                  "\"The quick brown fox jumps inside the lazy dog.\"",
+                  "\"" + fullText + "\"",
                   style: TextStyle(
                     color: Color(0xff333333),
                     fontSize: 24.0,
@@ -104,7 +134,7 @@ class _State extends State<Display>{
                   )
                 ),
                 child: Text(
-                  "\"Le renard brun rapide saute par-dessus le chien paresseux.\"",
+                  "\"" + translatedText + "\"",
                   style: TextStyle(
                     color: Color(0xff333333),
                     fontSize: 24.0,
