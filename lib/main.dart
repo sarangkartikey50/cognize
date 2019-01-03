@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cognize/utility/app_theme.dart';
 import 'package:cognize/utility/constants.dart';
+import 'package:cognize/utility/config.dart';
 import 'package:cognize/screens/display.dart';
 import 'package:aws_ai/src/RekognitionHandler.dart';
 import 'dart:convert';
@@ -299,13 +300,14 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   void recognizeText(path){
     File sourceImagefile = File(path);
 
-    RekognitionHandler rekognition = new RekognitionHandler(Constants.AWS_ACCESSKEY, Constants.AWS_SECRETKEY, Constants.AWS_REGION);
+    RekognitionHandler rekognition = new RekognitionHandler(Config.AWS_ACCESSKEY, Config.AWS_SECRETKEY, Config.AWS_REGION);
     Future<String> labelsArray = rekognition.detectText(sourceImagefile);
 
     String fullText = "";
 
     labelsArray.then((res) {
       var responseArray = jsonDecode(res);
+      print(res);
       var textDetections = responseArray["TextDetections"];
       print(textDetections.toString());
       for(var i=0; i<textDetections.length; i++){
@@ -320,11 +322,12 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Display({"fullText": fullText}),
+            builder: (context) => Display({"fullText": fullText, "imagePath": path}),
           ),
         );
       } else {
         print("there was some error.");
+        exit(0);
       }
     });
   }

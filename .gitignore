@@ -27,6 +27,7 @@
 .pub-cache/
 .pub/
 build/
+lib/utility/config.dart
 
 # Android related
 **/android/**/gradle-wrapper.jar

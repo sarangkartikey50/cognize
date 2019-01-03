@@ -3,7 +3,6 @@ import 'package:cognize/utility/constants.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:cognize/utility/customHttp.dart';
 import 'dart:convert';
-import 'package:aws_ai/src/TranslateHandler.dart';
 
 class Display extends StatefulWidget{
   var bundle;
@@ -19,12 +18,14 @@ class _State extends State<Display>{
   var bundle;
   var fullText = "";
   var translatedText = "";
+  var imagePath = "";
 
   _State(this.bundle);
 
   @override
   void initState(){
     fullText = this.bundle["fullText"];
+    imagePath = this.bundle["imagePath"];
     getHttpResponse();
   }
 
@@ -35,12 +36,11 @@ class _State extends State<Display>{
         "targetLanguage": "fr",
         "session": "abc"
       }));
-      print(response.body);
+      
     }
   }
 
   Widget build(BuildContext context){
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -166,7 +166,7 @@ class _State extends State<Display>{
               Container(
                 height: 200.0,
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: ExactAssetImage('lib/images/example.jpg'), fit: BoxFit.cover),
+                  image: DecorationImage(image: ExactAssetImage(imagePath), fit: BoxFit.cover),
                   borderRadius: BorderRadius.circular(10.0)
                 ),
               )

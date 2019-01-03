@@ -16,11 +16,6 @@ abstract class Constants{
     key.currentState.showSnackBar(new SnackBar(content: new Text(text)));
   }
 
-  //keys
-  static String AWS_ACCESSKEY="AKIAJIAPZMOW3ZULR2NA";
-  static String AWS_SECRETKEY="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";
-  static String AWS_REGION="eu-west-1";
-
   //urls
   static String TRANSLATE_URL = 'https://0qg0wcpzf2.execute-api.eu-west-1.amazonaws.com/stage/';
 
