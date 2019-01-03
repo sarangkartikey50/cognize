@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cognize/utility/constants.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:cognize/utility/customHttp.dart';
 import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:http/http.dart';
+import 'dart:typed_data';
+import 'dart:async';
 
 class Display extends StatefulWidget{
   var bundle;
@@ -19,6 +25,11 @@ class _State extends State<Display>{
   var fullText = "";
   var translatedText = "";
   var imagePath = "";
+  var sourceAudioUrl = "";
+  var translatedAudioUrl = "";
+  var sourceAudioPath = "";
+  var translatedAudioPath = "";
+  AudioPlayer audioPlayer;
 
   _State(this.bundle);
 
@@ -26,6 +37,7 @@ class _State extends State<Display>{
   void initState(){
     fullText = this.bundle["fullText"];
     imagePath = this.bundle["imagePath"];
+    audioPlayer = new AudioPlayer();
     getHttpResponse();
   }
 
@@ -36,7 +48,68 @@ class _State extends State<Display>{
         "targetLanguage": "fr",
         "session": "abc"
       }));
+      print(response.statusCode);
+      print(response.body);
+
+      if(response.statusCode == 200){
+        var body = jsonDecode(response.body)["body"];
+        setState((){
+          translatedText = body["processed"]["text"];
+          sourceAudioUrl = body["original"]["audio"];
+          translatedAudioUrl = body["processed"]["audio"];
+        });
+        downloadAudio();
+      }
       
+    }
+  }
+
+  void downloadAudio() async {
+    print(translatedAudioUrl);
+    var translatedPath = await load(translatedAudioUrl, 'translated');
+    print(translatedPath);
+    var sourcePath = await load(sourceAudioUrl, 'source');
+    print(sourcePath);   
+    setState(() {
+      sourceAudioPath = sourcePath;
+      translatedAudioPath = translatedPath;
+    });
+  }
+
+  Future<Uint8List> _loadFileBytes(String url) async {
+    Uint8List bytes;
+    try {
+      bytes = await readBytes(url);
+    } catch(e) {
+      rethrow;
+    }
+    return bytes;
+  }
+
+  Future<String> load(url, filename) async {
+    try {
+      final bytes = await _loadFileBytes(url);
+      final dir = await getApplicationDocumentsDirectory();
+      final file = new File('${dir.path}/${filename}${timestamp()}.mp3');
+
+      await file.writeAsBytes(bytes);
+      if (await file.exists()) {
+        return file.path;
+      }
+    } catch (e){
+      print('audio_provider.load => exception ${e}');
+    }
+    
+    return '';
+  }
+
+  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
+
+  void playAudio(path) async {
+    audioPlayer.stop();
+    int audioResponse = await audioPlayer.play(path, isLocal: true);
+    if(audioResponse != 1){
+      print('there was some error while playing the audio.');
     }
   }
 
@@ -108,7 +181,7 @@ class _State extends State<Display>{
                   ),
                   SizedBox(width: 5.0,),
                   GestureDetector(
-                    onTap: (){AudioCache().play('lib/resources/english.mp3');},
+                    onTap: (){playAudio(sourceAudioPath);},
                     child: Icon(Icons.volume_up, color: Color(0xffc4c4c4), size: 20.0,)
                   )
                 ],
@@ -157,7 +230,7 @@ class _State extends State<Display>{
                   ),
                   SizedBox(width: 5.0,),
                   GestureDetector(
-                    onTap: (){AudioCache().play('lib/resources/french.mp3');},
+                    onTap: (){playAudio(translatedAudioPath);},
                     child: Icon(Icons.volume_up, color: Color(0xffc4c4c4), size: 20.0,)
                   )
                 ],
