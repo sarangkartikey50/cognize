@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,7 +9,113 @@ import 'package:cognize/utility/config.dart';
 import 'package:cognize/screens/display.dart';
 import 'package:aws_ai/src/RekognitionHandler.dart';
 import 'dart:convert';
-import 'package:cognize/screens/display.dart';
+import 'package:flutter/cupertino.dart';
+
+List<String> _languages = const <String>['Arabic', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Finnish', 'French', 'German', 'Hebrew', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Polish', 'Portuguese', 'Russian', 'Spanish', 'Swedish', 'Turkish'];
+const _languagesMap = [
+  {'language': 'Arabic', 'code': 'ar'},
+  {'language': 'Chinese (Simplified)', 'code': 'zh'},
+  {'language': 'Chinese (Traditional)', 'code': 'zh-TW'},
+  {'language': 'Czech', 'code':'cs'},
+  {'language': 'Danish', 'code':'da'},
+  {'language': 'Dutch', 'code':'nl'},
+  {'language': 'English', 'code':'en'},
+  {'language': 'Finnish', 'code':'fi'},
+  {'language': 'French', 'code':'fr'},
+  {'language': 'German', 'code':'de'},
+  {'language': 'Hebrew', 'code':'he'},
+  {'language': 'Indonesian', 'code':'id'},
+  {'language': 'Italian', 'code':'it'},
+  {'language': 'Japanese', 'code':'ja'},
+  {'language': 'Korean', 'code':'ko'},
+  {'language': 'Polish', 'code':'pl'},
+  {'language': 'Portuguese', 'code':'pt'},
+  {'language': 'Russian', 'code':'ru'},
+  {'language': 'Spanish', 'code':'es'},
+  {'language': 'Swedish', 'code':'sv'},
+  {'language': 'Turkish', 'code':'tr'}
+];
+
+typedef void MyFormCallback(String value);
+
+class LanguageForm extends StatefulWidget {
+  final MyFormCallback onSubmit;
+
+  LanguageForm({this.onSubmit});
+
+  @override
+  _MyFormState createState() => _MyFormState();
+}
+
+class _MyFormState extends State<LanguageForm> {
+  String _radioValue = "";
+
+  List<Widget> renderRadioList(){
+    List<Widget> _list = [];
+    _languagesMap.forEach((item){
+      _list.add(Container(
+        child: Row(
+          children: <Widget>[
+            Radio(
+              value: item["code"],
+              groupValue: _radioValue,
+              onChanged: (value) => setState(() => this._radioValue = value),
+            ),
+            Text(item["language"])
+          ]
+        )
+      ));
+    });
+    return _list;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(
+        "Choose your language",
+        style: TextStyle(
+          color: Color(0xff333333),
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600
+        ),
+        textAlign: TextAlign.left,
+      ),
+      content: Container(
+        height: 300.0,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: renderRadioList(),
+          )
+        )
+      ),
+      actions: <Widget>[
+        new FlatButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              widget.onSubmit(_radioValue);
+            },
+            child: new Text("Select", style: TextStyle(
+              color: Color(0xff333333),
+              fontWeight: FontWeight.w600,
+              fontSize: 14.0
+            ),)
+        ),new FlatButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: new Text("Cancel", style: TextStyle(
+              color: Color(0xff333333),
+              fontWeight: FontWeight.w600,
+              fontSize: 14.0
+            ),)
+        ),
+      ]
+    );
+  }
+}
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -27,11 +132,25 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   String imagePath;
   String videoPath;
   VoidCallback videoPlayerListener;
+  String languageCode = "";
+  String targetLanguage = "";
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
   void initState(){
     onNewCameraSelected(cameras[0]);
+  }
+
+  void onSubmit(String result) {
+    for(var language in _languagesMap){
+      if(language["code"] == result){
+        setState(() {
+          languageCode = result;
+          targetLanguage = language["language"];
+        });
+      }
+    }
   }
 
   @override
@@ -48,7 +167,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
             )
           ),
           Positioned.fromRect(
-            rect: Rect.fromLTWH(MediaQuery.of(context).size.width/2 - 100.0, 50.0, 200.0, 100.0),
+            rect: Rect.fromLTWH(-20.0, 50.0, 200.0, 100.0),
             child: Container(
               height: 100.0,
               child: Text(
@@ -59,6 +178,21 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
                   color: Color(0xffffffff),
                   fontWeight: FontWeight.w500
                 )
+              )
+            )
+          ),
+          Positioned.fromRect(
+            rect: Rect.fromLTWH(MediaQuery.of(context).size.width - 150.0, 10.0, 200.0, 100.0),
+            child: Container(
+              height: 100.0,
+              child: InkWell(
+                child: Icon(Icons.translate, color: Colors.white, size: 20.0,),
+                onTap: (){
+                  showDialog(
+                    context: context,
+                    builder: (context) => LanguageForm(onSubmit: onSubmit),
+                  );
+                },
               )
             )
           ),
@@ -278,7 +412,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
       return null;
     }
     final Directory extDir = await getApplicationDocumentsDirectory();
-    final String dirPath = '${extDir.path}/Pictures/cognize';
+    final String dirPath = '${extDir.path}/Pictures';
     await Directory(dirPath).create(recursive: true);
     final String filePath = '$dirPath/${timestamp()}.jpg';
 
@@ -318,16 +452,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
           break;
       }
 
-      if(fullText.length > 0){
+      if(fullText.length > 0 && targetLanguage.length > 0){
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Display({"fullText": fullText, "imagePath": path}),
+            builder: (context) => Display({"fullText": fullText, "imagePath": path, "targetLanguage": targetLanguage, "languageCode": languageCode}),
           ),
         );
       } else {
-        print("there was some error.");
-        exit(0);
+        showInSnackBar("Please select your language!");
       }
     });
   }
@@ -357,6 +490,18 @@ Future<void> main() async {
   // Fetch the available cameras before initializing the app.
   try {
     cameras = await availableCameras();
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final Directory picturesPath = Directory('${dir.path}/Pictures/');
+    final Directory audioPath = Directory('${dir.path}/Audio/');
+
+    if(picturesPath.existsSync())
+      picturesPath.deleteSync(recursive: true);
+    else
+      picturesPath.createSync(recursive: true);
+    if(audioPath.existsSync())
+      audioPath.deleteSync(recursive: true);
+    else
+      audioPath.createSync(recursive: true);
   } on CameraException catch (e) {
     logError(e.code, e.description);
   }

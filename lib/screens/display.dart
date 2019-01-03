@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cognize/utility/constants.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:audioplayers/audio_cache.dart';
 import 'package:cognize/utility/customHttp.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
@@ -23,6 +22,8 @@ class _State extends State<Display>{
 
   var bundle;
   var fullText = "";
+  var targetLanguage = "";
+  var targetLanguageCode = "";
   var translatedText = "";
   var imagePath = "";
   var sourceAudioUrl = "";
@@ -35,6 +36,8 @@ class _State extends State<Display>{
 
   @override
   void initState(){
+    targetLanguage = this.bundle["targetLanguage"];
+    targetLanguageCode = this.bundle["languageCode"];
     fullText = this.bundle["fullText"];
     imagePath = this.bundle["imagePath"];
     audioPlayer = new AudioPlayer();
@@ -45,7 +48,7 @@ class _State extends State<Display>{
     if(fullText.length > 0){
       var response = await CustomHttp.customPost(Constants.TRANSLATE_URL, jsonEncode({
         "fullText": fullText,
-        "targetLanguage": "fr",
+        "targetLanguage": targetLanguageCode,
         "session": "abc"
       }));
       print(response.statusCode);
@@ -60,7 +63,6 @@ class _State extends State<Display>{
         });
         downloadAudio();
       }
-      
     }
   }
 
@@ -69,7 +71,7 @@ class _State extends State<Display>{
     var translatedPath = await load(translatedAudioUrl, 'translated');
     print(translatedPath);
     var sourcePath = await load(sourceAudioUrl, 'source');
-    print(sourcePath);   
+    print(sourcePath);
     setState(() {
       sourceAudioPath = sourcePath;
       translatedAudioPath = translatedPath;
@@ -90,7 +92,7 @@ class _State extends State<Display>{
     try {
       final bytes = await _loadFileBytes(url);
       final dir = await getApplicationDocumentsDirectory();
-      final file = new File('${dir.path}/${filename}${timestamp()}.mp3');
+      final file = new File('${dir.path}/Audio/${filename}${timestamp()}.mp3');
 
       await file.writeAsBytes(bytes);
       if (await file.exists()) {
@@ -99,7 +101,6 @@ class _State extends State<Display>{
     } catch (e){
       print('audio_provider.load => exception ${e}');
     }
-    
     return '';
   }
 
@@ -220,7 +221,7 @@ class _State extends State<Display>{
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "French",
+                    targetLanguage,
                     style: TextStyle(
                       color: Constants.primaryColor,
                       fontSize: 16.0,
