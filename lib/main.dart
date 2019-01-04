@@ -10,6 +10,7 @@ import 'package:cognize/screens/display.dart';
 import 'package:aws_ai/src/RekognitionHandler.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:cognize/utility/custom_shared_preferences.dart';
 
 List<String> _languages = const <String>['Arabic', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Finnish', 'French', 'German', 'Hebrew', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Polish', 'Portuguese', 'Russian', 'Spanish', 'Swedish', 'Turkish'];
 const _languagesMap = [
@@ -72,6 +73,7 @@ class _MyFormState extends State<LanguageForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      contentPadding: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0, bottom: 0.0),
       title: Text(
         "Choose your language",
         style: TextStyle(
@@ -82,7 +84,7 @@ class _MyFormState extends State<LanguageForm> {
         textAlign: TextAlign.left,
       ),
       content: Container(
-        height: 300.0,
+        height: 250.0,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
@@ -134,12 +136,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   VoidCallback videoPlayerListener;
   String languageCode = "";
   String targetLanguage = "";
+  CustomSharedPreferences _prefs = new CustomSharedPreferences();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState(){
     onNewCameraSelected(cameras[0]);
+    languageCode = _prefs.targetLanguageCode;
+    targetLanguage = _prefs.targetLanguage;
   }
 
   void onSubmit(String result) {
@@ -149,6 +154,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
           languageCode = result;
           targetLanguage = language["language"];
         });
+        _prefs.saveLanguage(targetLanguage, languageCode);
       }
     }
   }

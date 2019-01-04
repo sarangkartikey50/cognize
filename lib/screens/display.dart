@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 
 class Display extends StatefulWidget{
   var bundle;
@@ -49,7 +50,7 @@ class _State extends State<Display>{
       var response = await CustomHttp.customPost(Constants.TRANSLATE_URL, jsonEncode({
         "fullText": fullText,
         "targetLanguage": targetLanguageCode,
-        "session": "abc"
+        "session": Uuid().v1()
       }));
       print(response.statusCode);
       print(response.body);

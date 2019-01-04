@@ -29,6 +29,8 @@ dependencies:
   camera: ^0.2.6
   audioplayers: ^0.7.8
   aws_ai: ^0.0.3
+  uuid: ^1.0.3
+  shared_preferences: ^0.4.3
 
 dev_dependencies:
   flutter_test:
