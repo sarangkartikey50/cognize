@@ -50,6 +50,11 @@ class LanguageForm extends StatefulWidget {
 
 class _MyFormState extends State<LanguageForm> {
   String _radioValue = "";
+  CustomSharedPreferences _prefs = CustomSharedPreferences();
+
+  _MyFormState(){
+    _radioValue = _prefs.targetLanguageCode;
+  }
 
   List<Widget> renderRadioList(){
     List<Widget> _list = [];
@@ -137,6 +142,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   String languageCode = "";
   String targetLanguage = "";
   CustomSharedPreferences _prefs = new CustomSharedPreferences();
+  bool _isLoading = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -230,7 +236,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
                         fontSize: 16.0,
                         fontWeight: FontWeight.w500
                       ), textAlign: TextAlign.left,)
-                    )
+                    ),
+                    SizedBox(height: 9.0),
+                    _isLoading ? LinearProgressIndicator(value: null, valueColor: AlwaysStoppedAnimation<Color>(Constants.primaryColor), backgroundColor: Constants.primaryColor.withOpacity(0.3),) : Container()
                   ],
                 )
               )
@@ -270,6 +278,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
 
   void cameraClicked(){
+    setState(() {
+      _isLoading = true;
+    });
     onTakePictureButtonPressed();
   }
 
@@ -407,7 +418,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
         setState(() {
           imagePath = filePath;
         });
-        if (filePath != null) showInSnackBar('Picture saved to $filePath');
+        if (filePath == null) showInSnackBar('There was some error!');
       }
     });
   }
@@ -458,7 +469,10 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
           break;
       }
 
-      if(fullText.length > 0 && targetLanguage.length > 0){
+      setState(() {
+        _isLoading = false;
+      });
+      if(fullText != null && fullText.length > 0 && targetLanguage != null && targetLanguage.length > 0){
         Navigator.push(
           context,
           MaterialPageRoute(

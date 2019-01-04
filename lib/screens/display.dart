@@ -9,6 +9,8 @@ import 'package:http/http.dart';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
+import 'package:cognize/widgets/suggestions.dart';
+import 'package:cognize/widgets/translation_loader.dart';
 
 class Display extends StatefulWidget{
   var bundle;
@@ -31,6 +33,7 @@ class _State extends State<Display>{
   var translatedAudioUrl = "";
   var sourceAudioPath = "";
   var translatedAudioPath = "";
+  var suggestions;
   AudioPlayer audioPlayer;
 
   _State(this.bundle);
@@ -61,6 +64,7 @@ class _State extends State<Display>{
           translatedText = body["processed"]["text"];
           sourceAudioUrl = body["original"]["audio"];
           translatedAudioUrl = body["processed"]["audio"];
+          suggestions = body["phrases"];
         });
         downloadAudio();
       }
@@ -140,6 +144,14 @@ class _State extends State<Display>{
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
+              Container(
+                height: 200.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(image: ExactAssetImage(imagePath), fit: BoxFit.cover),
+                  borderRadius: BorderRadius.circular(10.0)
+                ),
+              ),
+              SizedBox(height: 40),
               Text(
                 "Actual Text",
                 style: TextStyle(
@@ -149,6 +161,7 @@ class _State extends State<Display>{
                 ),
                 textAlign: TextAlign.left,
               ),
+              SizedBox(height: 10.0),
               Container(
                 padding: EdgeInsets.only(left: 10.0),
                 decoration: BoxDecoration(
@@ -169,11 +182,12 @@ class _State extends State<Display>{
                   textAlign: TextAlign.left,
                 ),
               ),
+              SizedBox(height: 10.0),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "English",
+                    "Source Language",
                     style: TextStyle(
                       color: Constants.primaryColor,
                       fontSize: 16.0,
@@ -198,55 +212,61 @@ class _State extends State<Display>{
                 ),
                 textAlign: TextAlign.left,
               ),
-              Container(
-                padding: EdgeInsets.only(left: 10.0),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      width: 2.0,
-                      color: Color(0xffefefef)
-                    )
-                  )
-                ),
-                child: Text(
-                  "\"" + translatedText + "\"",
-                  style: TextStyle(
-                    color: Color(0xff333333),
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              translatedText.length > 0 ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    targetLanguage,
+                SizedBox(height: 10.0),
+                Container(
+                  padding: EdgeInsets.only(left: 10.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        width: 2.0,
+                        color: Color(0xffefefef)
+                      )
+                    )
+                  ),
+                  child: Text(
+                    "\"" + translatedText + "\"",
                     style: TextStyle(
-                      color: Constants.primaryColor,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
+                      color: Color(0xff333333),
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.w400,
                     ),
                     textAlign: TextAlign.left,
                   ),
-                  SizedBox(width: 5.0,),
-                  GestureDetector(
-                    onTap: (){playAudio(translatedAudioPath);},
-                    child: Icon(Icons.volume_up, color: Color(0xffc4c4c4), size: 20.0,)
-                  )
-                ],
-              ),
-              SizedBox(height: 40.0),
-              Container(
-                height: 200.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(image: ExactAssetImage(imagePath), fit: BoxFit.cover),
-                  borderRadius: BorderRadius.circular(10.0)
                 ),
-              )
-            ],
-          )
+                SizedBox(height: 10.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      targetLanguage,
+                      style: TextStyle(
+                        color: Constants.primaryColor,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    SizedBox(width: 5.0,),
+                    GestureDetector(
+                      onTap: (){playAudio(translatedAudioPath);},
+                      child: Icon(Icons.volume_up, color: Color(0xffc4c4c4), size: 20.0,)
+                    )
+                  ],
+                ),
+                SizedBox(height: 40.0),
+                Text("Suggestions", style: TextStyle(
+                  color: Constants.primaryColor,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500
+                ), textAlign: TextAlign.left,),
+                SizedBox(height: 10.0),
+                Suggestions(suggestions)
+              ],) : TranslationLoader(),
+            ]
+          ),
         )
       ),
     );
