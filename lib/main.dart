@@ -11,6 +11,7 @@ import 'package:aws_ai/src/RekognitionHandler.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:cognize/utility/custom_shared_preferences.dart';
+import 'package:connectivity/connectivity.dart';
 
 List<String> _languages = const <String>['Arabic', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Czech', 'Danish', 'Dutch', 'English', 'Finnish', 'French', 'German', 'Hebrew', 'Indonesian', 'Italian', 'Japanese', 'Korean', 'Polish', 'Portuguese', 'Russian', 'Spanish', 'Swedish', 'Turkish'];
 const _languagesMap = [
@@ -143,6 +144,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   String targetLanguage = "";
   CustomSharedPreferences _prefs = new CustomSharedPreferences();
   bool _isLoading = false;
+  StreamSubscription<ConnectivityResult> subscription;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -151,6 +153,11 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
     onNewCameraSelected(cameras[0]);
     languageCode = _prefs.targetLanguageCode;
     targetLanguage = _prefs.targetLanguage;
+  }
+
+  dispose() {
+    subscription.cancel();
+    super.dispose();
   }
 
   void onSubmit(String result) {
@@ -277,7 +284,12 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
 
 
 
-  void cameraClicked(){
+  void cameraClicked() async {
+    var connectivityResult = await (new Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      showInSnackBar("Please check your internet connection!");
+      return;
+    }
     setState(() {
       _isLoading = true;
     });
@@ -413,6 +425,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
   }
 
   void onTakePictureButtonPressed() {
+    if(targetLanguage == null || targetLanguage.length == 0){
+      showInSnackBar("Please select your language!");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
     takePicture().then((String filePath) {
       if (mounted) {
         setState(() {
@@ -472,7 +491,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
       setState(() {
         _isLoading = false;
       });
-      if(fullText != null && fullText.length > 0 && targetLanguage != null && targetLanguage.length > 0){
+      if(fullText != null && fullText.length > 0){
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -480,7 +499,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> {
           ),
         );
       } else {
-        showInSnackBar("Please select your language!");
+        showInSnackBar("Oops! No text found. Make sure you're pointing on the right direction.");
       }
     });
   }
