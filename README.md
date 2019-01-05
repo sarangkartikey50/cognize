@@ -1,16 +1,19 @@
-# cognize
+# Cognize
 
-A new Flutter project.
+A cross platform mobile application built using Flutter.
+This application allows a user to capture an image and translate text to his/her language of choice.
 
-## Getting Started
+## Requirements
+* Flutter 
+* AWS 
+* Mobile with IOS/Android or Android/IOS emulator
 
-This project is a starting point for a Flutter application.
+## How to run the application
+* Clone the repository.
+* Open terminal and run "flutter packages get" command to get all the dependencies.
+* Connect mobile to your system in debug mode.
+* Run "flutter run" command.
+* Viola! The app will start running on your mobile.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## For more information refer to 
+1. [System Design](https://drive.google.com/open?id=15LMmay_zPnrisKxQG2Vg725s8Bebw5Af)
