@@ -19,3 +19,4 @@ This application allows a user to capture an image and translate text to his/her
 ## Helpful Links
 1. [System Design](https://drive.google.com/open?id=15LMmay_zPnrisKxQG2Vg725s8Bebw5Af)
 2. [APK File](https://drive.google.com/drive/folders/1LUBNbP_QrMAOB4SJOKV_szM4ifhtu2cs?usp=sharing)
+3. [DEMO](https://www.youtube.com/watch?v=ZjjzEv6l7I0&t=4s)
